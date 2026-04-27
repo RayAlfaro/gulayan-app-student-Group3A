@@ -63,10 +63,168 @@ function ModalEditRecord({ isOpen, onClose, onSubmit, data }) {
 
   if (!isOpen) return null
 
+
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
-          {/* TODO create modal for updating new record. */}
+        {/* Header */}
+        <div className="flex justify-between items-center p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-800">Edit Record</h2>
+          <button
+            onClick={handleClose}
+            className="text-gray-500 hover:text-gray-700 text-2xl"
+          >
+            <FaTimes />
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Plant Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Plant Name *
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                placeholder="e.g., Tomato Plant"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+              />
+            </div>
+
+            {/* Variety */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Variety *
+              </label>
+              <select
+                name="variety"
+                value={formData.variety}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+              >
+                <option value="">Select a variety</option>
+                {plantVarieties.map((variety) => (
+                  <option key={variety} value={variety}>
+                    {variety}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Date Planted */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Date Planted *
+              </label>
+              <input
+                type="date"
+                name="date_planted"
+                value={formData.date_planted}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+              />
+            </div>
+
+            {/* Seedling Count */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Seedling Count
+              </label>
+              <input
+                type="number"
+                name="seedling_count"
+                value={formData.seedling_count}
+                onChange={handleChange}
+                placeholder="e.g., 50"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+              />
+            </div>
+
+            {/* Batch Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Batch Name
+              </label>
+              <input
+                type="text"
+                name="batch_name"
+                value={formData.batch_name}
+                onChange={handleChange}
+                placeholder="e.g., Batch A"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+              />
+            </div>
+
+            {/* Starting Fund */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Starting Fund
+              </label>
+              <InputPriceField
+                formData={formData}
+                setFormData={setFormData}
+                name="starting_fund"
+                placeholder="₱0.00"
+              />
+            </div>
+
+            {/* Supplier */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Supplier
+              </label>
+              <input
+                type="text"
+                name="supplier"
+                value={formData.supplier}
+                onChange={handleChange}
+                placeholder="e.g., Local Supplier"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Notes
+            </label>
+            <textarea
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+              placeholder="Add any additional notes..."
+              rows="4"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+            >
+              Update Record
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   )

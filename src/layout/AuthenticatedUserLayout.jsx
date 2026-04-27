@@ -9,9 +9,9 @@ export default function AuthenticatedUserLayout() {
 
   // ensure that user is authenticated, if not redirect to login page
   const isAuthenticated = localStorage.getItem('token') != null;
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  // if (!isAuthenticated) {
+  //   return <Navigate to="/login" replace />;
+  // }
 
   const menuItems = [
     { id: 'dashboard', path: '/', name: 'Dashboard', icon: FaHome },

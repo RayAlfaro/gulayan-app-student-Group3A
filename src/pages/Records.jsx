@@ -21,16 +21,52 @@ function Records() {
   const observerTarget = useRef(null);
   const isInInitialMount = useRef(true);
 
-  const handleSearchPlants = async () => {
-    // TODO search from the the backend; in case that all records is not yet loaded
+  const handleSearchPlants = async (query) => {
+    try {
+      if (!query.trim()) {
+        setRecords([]);
+        setHasMore(true);
+        handleLoadRecords(1, false);
+        return;
+      }
+
+      setIsLoading(true);
+      const response = await api.get(`/plants/search?q=${encodeURIComponent(query)}`);
+      setRecords(response.data.data || []);
+      setHasMore(false);
+    } catch (error) {
+      console.error("Error searching plants:", error);
+      toast.error("Error searching records.");
+    } finally {
+      setIsLoading(false);
+    }
   }
   const handleLoadRecords = async (page = 1, append = false) => {
-    //TODO: load the data from the database
-    //TODO: implement paginated data loading
+    try {
+      const isInitialLoad = page === 1 && !append;
+      if (isInitialLoad) {
+        setIsLoading(true);
+      } else {
+        setIsLoadingMore(true);
+      }
+
+      const response = await api.get(`/plants?page=${page}&per_page=10`);
+      const newRecords = response.data.data || [];
+      
+      setRecords(prev => append ? [...prev, ...newRecords] : newRecords);
+      setHasMore(response.data.has_more || false);
+    } catch (error) {
+      console.error("Error loading records:", error);
+      toast.error("Failed to load records.");
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
+    }
   }
   const handleAddRecord = async (formData) => {
     try {
-      //TODO: make add new record functional
+      const response = await api.post('/plants', formData);
+      setRecords(prev => [response.data, ...prev]);
       toast.success("New record saved.");
     } catch (error) {
       console.error(error);
@@ -41,7 +77,8 @@ function Records() {
   }
   const handleUpdateRecord = async (data) => {
     try {
-      //TODO make update record functional
+      await api.put(`/plants/${data.id}`, data);
+      setRecords(prev => prev.map(record => record.id === data.id ? data : record));
       toast.success("Plant data updated.");
     } catch (error) {
       console.error(error);
@@ -142,7 +179,10 @@ function Records() {
             type="text"
             placeholder="Search records..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              handleSearchPlants(e.target.value);
+            }}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
               focus:ring-green-500 focus:border-transparent outline-none"
           />

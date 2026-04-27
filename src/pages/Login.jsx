@@ -146,9 +146,13 @@ function Login() {
           <p className="mt-6 text-center text-sm text-gray-600">
             Don't have an account?{' '}
             <button
-              onClick={() => navigate('/signup')}
+              onClick={() => !loading && navigate('/signup')}
               disabled={loading}
-              className="cursor-pointer text-green-600 hover:text-green-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition">
+              className={`font-semibold transition ${
+                loading
+                  ? 'text-gray-400 cursor-not-allowed'
+                  : 'text-green-600 hover:text-green-700 cursor-pointer'
+              }`}>
               Sign up for free
             </button>
           </p>

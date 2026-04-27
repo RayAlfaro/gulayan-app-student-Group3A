@@ -7,7 +7,6 @@ import { api } from '../api';
 import { toast } from 'sonner';
 
 function Records() {
-  //TODO: add loading icon while ongoing ang loading ng records.
   const [records, setRecords] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,31 +20,86 @@ function Records() {
   const observerTarget = useRef(null);
   const isInInitialMount = useRef(true);
 
-  const handleSearchPlants = async () => {
-    // TODO search from the the backend; in case that all records is not yet loaded
+  const handleSearchPlants = async (query) => {
+    setSearchTerm(query);
+    
+    if (!query.trim()) {
+      setCurrentPage(1);
+      setHasMore(true);
+      handleLoadRecords(1, false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await api.get('/plants/search', {
+        params: { q: query }
+      });
+      setRecords(response.data.data || response.data);
+      setHasMore(false);
+    } catch (error) {
+      console.error('Search error:', error);
+      toast.error('Error searching records');
+    } finally {
+      setIsLoading(false);
+    }
   }
+
   const handleLoadRecords = async (page = 1, append = false) => {
-    //TODO: load the data from the database
-    //TODO: implement paginated data loading
+    try {
+      if (page === 1) {
+        setIsLoading(true);
+      } else {
+        setIsLoadingMore(true);
+      }
+
+      const response = await api.get('/plants', {
+        params: {
+          page: page,
+          limit: 10
+        }
+      });
+
+      const newRecords = response.data.data || response.data;
+      const hasMoreRecords = response.data.hasMore ?? (newRecords.length === 10);
+
+      if (append) {
+        setRecords(prev => [...prev, ...newRecords]);
+      } else {
+        setRecords(newRecords);
+      }
+
+      setHasMore(hasMoreRecords);
+    } catch (error) {
+      console.error('Load records error:', error);
+      toast.error('Error loading records');
+    } finally {
+      setIsLoading(false);
+      setIsLoadingMore(false);
+    }
   }
+
   const handleAddRecord = async (formData) => {
     try {
-      //TODO: make add new record functional
+      const response = await api.post('/plants', formData);
+      setRecords(prev => [response.data.data || response.data, ...prev]);
       toast.success("New record saved.");
     } catch (error) {
       console.error(error);
-      toast.error("Error encountered while saving record.");
+      toast.error(error.message || "Error encountered while saving record.");
     }
 
     setIsModalOpen(false)
   }
+
   const handleUpdateRecord = async (data) => {
     try {
-      //TODO make update record functional
+      await api.put(`/plants/${data.id}`, data);
+      setRecords(prev => prev.map(record => record.id === data.id ? data : record));
       toast.success("Plant data updated.");
     } catch (error) {
       console.error(error);
-      toast.error("Error encountered during update.");
+      toast.error(error.message || "Error encountered during update.");
     } finally {
       setIsEditRecord(false);
     }
@@ -142,15 +196,14 @@ function Records() {
             type="text"
             placeholder="Search records..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => handleSearchPlants(e.target.value)}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
               focus:ring-green-500 focus:border-transparent outline-none"
           />
         </div>
       </div>
 
-      {/* Records Table */}
-      {/* TODO implement pagination plants table */}
+      {/* Records Table with Infinite Scroll Pagination */}
       <div className="bg-white rounded-lg shadow-md border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto max-h-[580px] overflow-y-auto">
           <table className="relative w-full">

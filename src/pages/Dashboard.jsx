@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { FaLeaf, FaUsers, FaBoxOpen, FaChartLine } from "react-icons/fa";
-import axios from "axios";
+import { api } from "../api";
+import PlantLoading from "../components/PlantLoading";
 
 function Dashboard() {
  
   const [plants, setPlants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const stats = [
     {
       title: "Total Plants",
@@ -22,7 +25,21 @@ function Dashboard() {
 
 
   useEffect(() => {
-    // TODO fetch plants data from server
+    const fetchPlants = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get("/plants");
+        setPlants(response.data.data || response.data);
+        setError(null);
+      } catch (err) {
+        setError(err.message || "Failed to fetch plants data");
+        console.error("Error fetching plants:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlants();
   }, []);
 
   return (
@@ -56,7 +73,17 @@ function Dashboard() {
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           Recent Plants
         </h2>
-        <div className="overflow-x-auto">
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+        {loading ? (
+          <div className="py-12 flex justify-center">
+            <PlantLoading size='2xl' variant='pulse' text="Loading records" />
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
@@ -100,7 +127,8 @@ function Dashboard() {
               ))}
             </tbody>
           </table>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

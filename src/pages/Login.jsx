@@ -84,8 +84,9 @@ function Login() {
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 
                                 focus:ring-green-500 focus:border-transparent transition duration-200 
-                                outline-none"
+                                outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                 placeholder="you@example.com"
+                disabled={loading}
               />
             </div>
 
@@ -103,8 +104,9 @@ function Login() {
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2
                                  focus:ring-green-500 focus:border-transparent transition duration-200 
-                                 outline-none"
+                                 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                 placeholder="••••••••"
+                disabled={loading}
               />
             </div>
 

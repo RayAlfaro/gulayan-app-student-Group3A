@@ -203,7 +203,18 @@ function Records() {
         </div>
       </div>
 
-      {/* Records Table with Infinite Scroll Pagination */}
+       const handleUpdateRecord = async (data) => {
+        try {
+          await api.put(`/plants/${data.id}`, data);
+          setRecords(prev => prev.map(record => record.id === data.id ? data : record));
+          toast.success("Plant data updated.");
+        } catch (error) {
+          console.error(error);
+          toast.error(error.message || "Error encountered during update.");
+        } finally {
+          setIsEditRecord(false);
+        }
+      }
       <div className="bg-white rounded-lg shadow-md border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto max-h-[580px] overflow-y-auto">
           <table className="relative w-full">
